@@ -149,6 +149,9 @@ class GridVisualizer:
             ax.add_patch(circle)
             ax.text(x+0.25, y-0.25, 'a5', ha='center', va='center', fontsize=8, color='red')
 
+    def set_all_action(self, policy):
+        self.actions = policy
+
 def create_example_grid():
     """Create an example grid for demonstration"""
     # Create 4x5 grid
