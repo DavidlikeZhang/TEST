@@ -14,6 +14,24 @@ import os
 
 class ValueIteration:
     def __init__(self, grid, gamma=0.9, reward_target=1, reward_forbidden=-1, reward_normal=0, epsilon=0.01):
+        """
+        Value Iteration algorithm specially for grid
+        :param grid: consist of grid type and grid action
+        :param gamma: discount factor. 0 < gamma <= 1. 1 means no discount factor
+        :param epsilon: state value convergence threshold
+
+        while (abs(v_k - v_(k-1)) > epsilon) do:
+            for every s in S do:       # here s is (i, j)
+                for every a in A(s) do:
+                    q(s,a) = r(s,a) + gamma * v(s')
+                    policy_k+1(a|s) = 1 if a(s) = argmax_a q(s,a)
+                    v(s) = max_a q(s,a), the max action value of each state
+
+        """
+        assert isinstance(grid, GridVisualizer)
+        assert 0 < gamma <= 1
+        assert 0 <= epsilon
+
         self.grid = grid
         self.gamma = gamma
         self.reward_target = reward_target
@@ -27,7 +45,6 @@ class ValueIteration:
         self.state_values = np.zeros((self.grid.m, self.grid.n))
         self.state_values_prev = np.full((self.grid.m, self.grid.n), -np.inf)
         self.action_values = np.zeros((self.grid.m, self.grid.n, self.action_type_num))
-
         self.max_action_value = np.zeros((self.grid.m, self.grid.n))
         self.max_action_value_idex = np.zeros((self.grid.m, self.grid.n))
 
@@ -38,6 +55,8 @@ class ValueIteration:
     def _init_immediate_rewards(self):
         '''
         init the immediate rewards
+        s_a1: the cell type when moving up
+        immediate_rewards[i, j, 0]: the immediate reward at s_a1
         '''
         for i in range(self.grid.m):
             for j in range(self.grid.n):
@@ -98,40 +117,38 @@ class ValueIteration:
                 else:
                     self.immediate_rewards[i, j, 4] = self.reward_normal
 
-
     def run(self) -> np.ndarray:
         """
         run the value interation algorithm
-        :return: None
+        :return: the optimal policy
         """
         while(not self._is_converged()):
             self._step()
         return self.policy
 
-
     def _step(self):
+        """
+        one step of value interation
+        """
+        # save the previous state value for threshold check
         self.state_values_prev = self.state_values.copy()
+
         for i in range(self.grid.m):
             for j in range(self.grid.n):
                 self._update_policy(i, j)
                 self._calc_state_value(i, j)
 
-
     def _calc_state_value(self, i, j):
         """
         :param i: row
         :param j: column
-        :return: v(i,j) = max_a q(i,j,a)
+        :return: v(i,j) = max_a q(i,j,a), the max action value of each state
         """
         self.state_values[i, j] = self.max_action_value[i, j]
-
 
     def _calc_action_value(self, i, j, a):
         """
         q(i,j,a) = r(i,j,a) + gamma * v(i,j)
-        :param i:
-        :param j:
-        :param a:
         :return:
         """
         self.action_values[i, j, a] = self.immediate_rewards[i, j, a] + self.gamma * self.state_values[i, j]
