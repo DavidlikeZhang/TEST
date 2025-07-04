@@ -22,19 +22,19 @@ This program creates m×n grid visualizations with states and actions using Pyth
 ### Basic Example
 
 ```python
-from TEST_VIA_IN_CELL import GridVisualizer, CellType, ActionType
+from GridVisualizer import GridVisualizer, CellType, ActionType
 import matplotlib.pyplot as plt
 
 # Create a 3x3 grid
 grid = GridVisualizer(3, 3)
 
 # Set cell types
-grid.set_cell_type(0, 2, CellType.TARGET)     # Top-right as target
+grid.set_cell_type(0, 2, CellType.TARGET)  # Top-right as target
 grid.set_cell_type(1, 1, CellType.FORBIDDEN)  # Center as forbidden
 
 # Set actions
 grid.set_action(0, 0, ActionType.RIGHT)  # s1: move right
-grid.set_action(0, 1, ActionType.DOWN)   # s2: move down
+grid.set_action(0, 1, ActionType.DOWN)  # s2: move down
 
 # Visualize
 fig, ax = grid.visualize()
@@ -87,7 +87,7 @@ pip install numpy matplotlib
 
 ### Run the main example (4x5 grid):
 ```bash
-python3 TEST_VIA_IN_CELL.py
+python3 GridVisualizer.py
 ```
 
 ### Run the simple demo (3x3 grid):

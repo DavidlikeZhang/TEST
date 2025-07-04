@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from enum import Enum
+import os
 
 class CellType(Enum):
     """Cell types for the grid"""
@@ -155,7 +156,6 @@ def create_example_grid():
     
     # Set some target cells (blue)
     grid.set_cell_type(0, 4, CellType.TARGET)  # Top-right corner
-    grid.set_cell_type(3, 0, CellType.TARGET)  # Bottom-left corner
     
     # Set some forbidden areas (yellow)
     grid.set_cell_type(1, 2, CellType.FORBIDDEN)
@@ -196,9 +196,14 @@ if __name__ == '__main__':
     fig, ax = grid.visualize()
     
     # Save the plot
-    plt.savefig('/tmp/grid_visualization.png', dpi=150, bbox_inches='tight')
+    try:
+        os.chdir("img")
+    except OSError:
+        os .mkdir("img")
+        os.chdir("img")
+    plt.savefig('grid_visualization.png', dpi=150, bbox_inches='tight')
     print("Grid visualization saved to /tmp/grid_visualization.png")
-    
+
     # Also show if display is available
     try:
         plt.show()

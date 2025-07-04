@@ -5,7 +5,7 @@
 # @function: Simple demo for grid visualization
 # @version : V1
 
-from TEST_VIA_IN_CELL import GridVisualizer, CellType, ActionType
+from GridVisualizer import GridVisualizer, CellType, ActionType
 import matplotlib.pyplot as plt
 
 def create_simple_demo():
