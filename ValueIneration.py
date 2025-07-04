@@ -41,51 +41,55 @@ class ValueIteration:
         '''
         for i in range(self.grid.m):
             for j in range(self.grid.n):
+                # move up
                 try:
                     s_a1 = self.grid.cell_types[i - 1, j]
-                    if s_a1 == CellType.TARGET:
-                        self.immediate_rewards[i, j, 0] = self.reward_target
-                    elif s_a1 == CellType.FORBIDDEN or i - 1 == -1:
+                    if s_a1 == CellType.FORBIDDEN or i - 1 == -1:
                         self.immediate_rewards[i, j, 0] = self.reward_forbidden
+                    elif s_a1 == CellType.TARGET:
+                        self.immediate_rewards[i, j, 0] = self.reward_target
                     else:
                         self.immediate_rewards[i, j, 0] = self.reward_normal
                 except IndexError:
                     self.immediate_rewards[i, j, 0] = self.reward_forbidden
 
+                # move right
                 try:
                     s_a2 = self.grid.cell_types[i, j + 1]
                     if s_a2 == CellType.TARGET:
                         self.immediate_rewards[i, j, 1] = self.reward_target
-                    elif s_a2 == CellType.FORBIDDEN or j + 1 == self.grid.n:
+                    elif s_a2 == CellType.FORBIDDEN:
                         self.immediate_rewards[i, j, 1] = self.reward_forbidden
                     else:
                         self.immediate_rewards[i, j, 1] = self.reward_normal
-                except IndexError:
+                except IndexError:  # out of range
                     self.immediate_rewards[i, j, 1] = self.reward_forbidden
 
+                # move down
                 try:
                     s_a3 = self.grid.cell_types[i + 1, j]
                     if s_a3 == CellType.TARGET:
                         self.immediate_rewards[i, j, 2] = self.reward_target
-                    elif s_a3 == CellType.FORBIDDEN or i + 1 == self.grid.m:
+                    elif s_a3 == CellType.FORBIDDEN:
                         self.immediate_rewards[i, j, 2] = self.reward_forbidden
                     else:
                         self.immediate_rewards[i, j, 2] = self.reward_normal
                 except IndexError:
                     self.immediate_rewards[i, j, 2] = self.reward_forbidden
 
+                # move left
                 try:
                     s_a4 = self.grid.cell_types[i, j - 1]
-                    if s_a4 == CellType.TARGET:
-                        self.immediate_rewards[i, j, 3] = self.reward_target
-                    elif s_a4 == CellType.FORBIDDEN or j - 1 == -1:
+                    if s_a4 == CellType.FORBIDDEN or j - 1 == -1:
                         self.immediate_rewards[i, j, 3] = self.reward_forbidden
+                    elif s_a4 == CellType.TARGET:
+                        self.immediate_rewards[i, j, 3] = self.reward_target
                     else:
                         self.immediate_rewards[i, j, 3] = self.reward_normal
                 except IndexError:
                     self.immediate_rewards[i, j, 3] = self.reward_forbidden
 
-
+                # stay
                 s_a5 = self.grid.cell_types[i, j]
                 if s_a5 == CellType.TARGET:
                     self.immediate_rewards[i, j, 4] = self.reward_target
