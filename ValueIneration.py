@@ -48,9 +48,11 @@ class ValueIteration:
         self.max_action_value = np.zeros((self.grid.m, self.grid.n))
         self.max_action_value_idex = np.zeros((self.grid.m, self.grid.n))
 
-        self.policy = np.full((self.grid.m, self.grid.n), ActionType.UP)
+        self.policy = np.full((self.grid.m, self.grid.n), ActionType.STAY)
 
         self._init_immediate_rewards()
+
+        self.iteration_num = 0
 
     def _init_immediate_rewards(self):
         '''
@@ -124,7 +126,11 @@ class ValueIteration:
         """
         while(not self._is_converged()):
             self._step()
+            self.iteration_num += 1
         return self.policy
+
+    def get_iteration_num(self) -> int:
+        return self.iteration_num
 
     def _step(self):
         """
@@ -156,6 +162,7 @@ class ValueIteration:
     def _update_policy(self, i, j):
         for a in range(self.action_type_num):
             self._calc_action_value(i, j, a)
+        # find out which action has the max value
         self.max_action_value_idex[i, j] = np.argmax(self.action_values[i, j])
         if self.max_action_value_idex[i, j] == 0:
             self.policy[i, j] = ActionType.UP
@@ -177,9 +184,10 @@ class ValueIteration:
 
 if __name__ == "__main__":
     grid = create_example_grid()
-    vi = ValueIteration(grid)
+    vi = ValueIteration(grid, epsilon=0.1)
     grid.set_all_action(vi.run())
-
+    print("iteration num: ", vi.get_iteration_num())
+    # Visualize the grid
     fig, ax = grid.visualize()
 
     # Save the plot
