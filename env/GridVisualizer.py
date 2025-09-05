@@ -11,11 +11,13 @@ import matplotlib.patches as patches
 from enum import Enum
 import os
 
+
 class CellType(Enum):
     """Cell types for the grid"""
     NORMAL = 'white'      # Normal cell (white)
     TARGET = 'blue'       # Target cell (blue)
     FORBIDDEN = 'yellow'  # Forbidden area (yellow)
+
 
 class ActionType(Enum):
     """Action types for each state"""
@@ -200,10 +202,10 @@ if __name__ == '__main__':
     
     # Save the plot
     try:
-        os.chdir("img")
+        os.chdir("../img")
     except OSError:
-        os .mkdir("img")
-        os.chdir("img")
+        os .mkdir("../img")
+        os.chdir("../img")
     plt.savefig('grid_visualization.png', dpi=150, bbox_inches='tight')
     print("Grid visualization saved to /tmp/grid_visualization.png")
 

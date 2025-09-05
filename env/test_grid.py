@@ -9,7 +9,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(__file__))
 
-from GridVisualizer import GridVisualizer, CellType, ActionType
+from env.GridVisualizer import GridVisualizer, CellType, ActionType
 
 def test_grid_creation():
     """Test basic grid creation"""

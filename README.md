@@ -22,7 +22,7 @@ This program creates m×n grid visualizations with states and actions using Pyth
 ### Basic Example
 
 ```python
-from GridVisualizer import GridVisualizer, CellType, ActionType
+from env.GridVisualizer import GridVisualizer, CellType, ActionType
 import matplotlib.pyplot as plt
 
 # Create a 3x3 grid

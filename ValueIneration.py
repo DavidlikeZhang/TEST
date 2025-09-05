@@ -5,7 +5,7 @@
 # @function: the script is used to do something.
 # @version : V1
 
-from GridVisualizer import GridVisualizer, CellType, ActionType, create_example_grid
+from env.GridVisualizer import GridVisualizer, CellType, ActionType, create_example_grid
 
 import numpy as np
 import matplotlib.pyplot as plt
