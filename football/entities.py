@@ -39,8 +39,8 @@ class Ball(Entity):
         self.radius = radius
         # 球的物理属性
         # TODO: 调节下面两个值
-        self.mass = 1.0
-        self.friction = 0.98  # 摩擦系数
+        self.mass = 50.0
+        self.friction = 0.88  # 摩擦系数
 
     def update(self, dt):
         """更新球的位置，考虑摩擦力"""
@@ -130,7 +130,7 @@ class Obstacle(Entity):
         super().__init__(x, y, width, height, (150, 75, 0))  # 棕色障碍物
         self.target_x = x
         self.target_y = y
-        self.speed = 50.0  # 障碍物移动速度
+        self.speed = 20.0  # TODO: 障碍物移动速度
 
     def move_towards_ball(self, ball, goal):
         """移动障碍物挡在球和球门之间"""

@@ -1,1 +1,4 @@
 9/7 第一次迭代完成，启动后必须要按一下shift退出中文输入法。能检测到碰撞，但没有反弹。自己和障碍碰撞检测不到
+
+9/9 修好碰撞、摩擦
+ValueError: could not broadcast input array from shape (15,) into shape (13,)
