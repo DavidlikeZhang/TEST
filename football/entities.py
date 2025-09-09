@@ -68,51 +68,13 @@ class Player(Entity):
         # 球员的物理属性
         # TODO: 调节下面几个值
         self.mass = 5.0
-        self.max_speed = 200.0
+        self.max_speed = 100.0
         self.perception_range = 150.0  # 球员感知范围
 
         # 是否看到球
         self.can_see_ball = False
 
         self.max_kick = 500  # 最大踢球力度
-
-    def kick(self, ball, power, direction):
-        """踢球函数
-
-        Args:
-            ball: 足球对象
-            power: 踢球力度 (0-1)
-            direction: 踢球方向 (度数)
-        """
-        if collide_rect_circle(self, ball):
-            # 计算踢球方向的向量
-            rad = np.radians(direction)
-            force_x = np.cos(rad) * power * self.max_kick  # 最大力度
-            force_y = np.sin(rad) * power * self.max_kick
-
-            # 应用力到球上
-            ball.vx += force_x / ball.mass
-            ball.vy += force_y / ball.mass
-            return True
-        return False
-
-    def pass_ball(self, ball, target_player, power=0.7):
-        """传球函数
-
-        Args:
-            ball: 足球对象
-            target_player: 目标球员
-            power: 踢球力度 (0-1)
-        """
-        if collide_rect_circle(self, ball):
-            # 计算方向
-            dx = target_player.x - self.x
-            dy = target_player.y - self.y
-            angle = np.degrees(np.arctan2(dy, dx))
-
-            # 调用踢球函数
-            return self.kick(ball, power, angle)
-        return False
 
     def can_perceive_ball(self, ball):
         """检查球员是否能感知到球"""
@@ -146,11 +108,13 @@ class Player(Entity):
         pygame.draw.rect(screen, self.color, rect)
 
         # 绘制朝向指示线
+        # TODO: 去掉这段代码，将绘制矩形改为基于四个旋转后的顶点绘制线段
         direction_x = np.cos(np.radians(self.angle)) * 20
         direction_y = np.sin(np.radians(self.angle)) * 20
         pygame.draw.line(screen, (255, 255, 255),
                          (int(self.x), int(self.y)),
                          (int(self.x + direction_x), int(self.y + direction_y)), 2)
+
 
         # 如果能看到球，绘制感知范围
         if self.can_see_ball:

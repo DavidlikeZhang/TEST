@@ -46,8 +46,22 @@ def collide_rect_circle(rect, circle):
     return dist_sq <= circle.radius ** 2
 
 
+n = 0  # 防止"处理碰撞"刷屏
+
+
 def handle_collision(entity1, entity2):
-    """处理两个实体之间的碰撞（如球与旋转方形碰撞响应）"""
+    """
+    处理两个实体之间的碰撞（如球与旋转方形碰撞响应）
+    里面的计算有点复杂，赶时间，没来得及完全理解
+    """
+    # 防止"处理碰撞"刷屏
+    global n
+    if n % 10 == 0:
+        # 谁和谁碰撞
+        print(f"{entity1}和{entity2}碰撞")
+    n += 1
+
+    # TODO： 反弹方向是怎么计算的
     # 假设entity1是球
     # 计算最近碰撞点
     angle = -entity2.angle
@@ -74,15 +88,26 @@ def handle_collision(entity1, entity2):
     else:
         nx, ny = nx / norm, ny / norm
 
-    # 简化反弹
-    v_dot_n = entity1.vx * nx + entity1.vy * ny
+    # 球相对球员的速度（关键！）
+    rvx = entity1.vx - entity2.vx
+    rvy = entity1.vy - entity2.vy
+
+    # 投影到法线
+    v_dot_n = rvx * nx + rvy * ny
     if v_dot_n < 0:
-        entity1.vx -= 2 * v_dot_n * nx
-        entity1.vy -= 2 * v_dot_n * ny
-        # 摩擦和反弹衰减
-        # TODO: 0.8这个值可能要调整
-        entity1.vx *= 0.8
-        entity1.vy *= 0.8
+        # 反弹法向速度
+        # TODO: 反弹系数最好变成一个随机数
+        restitution = 0.4  # 反弹系数
+        impulse = -(1 + restitution) * v_dot_n
+        # 可用质量加权：impulse /= (1/entity1.mass + 1/entity2.mass)
+        entity1.vx += impulse * nx
+        entity1.vy += impulse * ny
+
+        # 位置修正，避免球嵌入
+    overlap = entity1.radius - norm
+    if overlap > 0:
+        entity1.x += nx * overlap
+        entity1.y += ny * overlap
 
 
 def rotate_point(px, py, cx, cy, angle_deg):
