@@ -170,6 +170,8 @@ class SoccerEnv(gym.Env):
         goal = is_goal(self.ball, self.width, self.height)
         if goal == -1:  # 左队进球
             self.reward += -self.goal_reward
+
+            print(1)
             self.done = True
         elif goal == 1:  # TODO：右队进球，我们默认是右队，实际部署是也要这样
             self.reward = 10
