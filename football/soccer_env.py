@@ -20,7 +20,7 @@ from utils import draw_field, is_goal
 class SoccerEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(self, width=800, height=600, num_players=1, num_obstacles=0, max_steps=10000):
+    def __init__(self, width=800, height=600, num_players=1, num_obstacles=3, max_steps=10000):
         super(SoccerEnv, self).__init__()
 
         # 训练参数
@@ -96,11 +96,12 @@ class SoccerEnv(gym.Env):
         # 创建足球
         self.ball = Ball(self.width // 2, self.height // 2)
 
+        # TODO: 修改球员的创建位置
         # 创建球员
         self.players = [Player(100 + i * 100, self.height // 2) for i in range(self.num_players)]
         
         # 创建障碍物
-        self.obstacles = [Obstacle(300 + i * 150, self.height // 2) for i in range(self.num_obstacles)]
+        self.obstacles = [Obstacle(500 + i * 50, self.height // 2) for i in range(self.num_obstacles)]
         
         # 重置奖励和完成标志
         self.reward = 0
@@ -170,8 +171,6 @@ class SoccerEnv(gym.Env):
         goal = is_goal(self.ball, self.width, self.height)
         if goal == -1:  # 左队进球
             self.reward += -self.goal_reward
-
-            print(1)
             self.done = True
         elif goal == 1:  # TODO：右队进球，我们默认是右队，实际部署是也要这样
             self.reward = 10
