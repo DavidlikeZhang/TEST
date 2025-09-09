@@ -11,7 +11,7 @@
 
 import pygame
 import numpy as np
-from soccer_env import SoccerEnv
+from envs.environment.soccer_env import SoccerEnv
 
 
 def main():

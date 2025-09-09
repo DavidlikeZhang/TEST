@@ -1,98 +1,19 @@
-# Grid Visualization Program
+# 足球策略训练2D
 
-This program creates m×n grid visualizations with states and actions using Python matplotlib and numpy.
+该程序使用 Python 的 matplotlib 和 numpy 创建 m×n 的网格可视化，包含状态和动作。
 
-## Features
 
-- **Grid Creation**: Create m×n grids with customizable dimensions
-- **Cell Types**: 
-  - Normal cells (white)
-  - Target cells (blue) 
-  - Forbidden areas (yellow)
-- **State Numbering**: States numbered s1, s2, ... from left to right, top to bottom
-- **Action Visualization**: 
-  - a1: Up arrow (↑)
-  - a2: Right arrow (→)
-  - a3: Down arrow (↓)
-  - a4: Left arrow (←)
-  - a5: Circle (○) - stay in place
-
-## Usage
-
-### Basic Example
-
-```python
-from env.GridVisualizer import GridVisualizer, CellType, ActionType
-import matplotlib.pyplot as plt
-
-# Create a 3x3 grid
-grid = GridVisualizer(3, 3)
-
-# Set cell types
-grid.set_cell_type(0, 2, CellType.TARGET)  # Top-right as target
-grid.set_cell_type(1, 1, CellType.FORBIDDEN)  # Center as forbidden
-
-# Set actions
-grid.set_action(0, 0, ActionType.RIGHT)  # s1: move right
-grid.set_action(0, 1, ActionType.DOWN)  # s2: move down
-
-# Visualize
-fig, ax = grid.visualize()
-plt.show()
-```
-
-### State Numbering
-
-States are numbered from 1, going left to right, top to bottom:
-
-```
-3x3 Grid:
-s1  s2  s3
-s4  s5  s6  
-s7  s8  s9
-```
-
-### Available Cell Types
-
-- `CellType.NORMAL`: White cells (default)
-- `CellType.TARGET`: Blue cells
-- `CellType.FORBIDDEN`: Yellow cells
-
-### Available Actions
-
-- `ActionType.UP`: a1 - Up arrow
-- `ActionType.RIGHT`: a2 - Right arrow  
-- `ActionType.DOWN`: a3 - Down arrow
-- `ActionType.LEFT`: a4 - Left arrow
-- `ActionType.STAY`: a5 - Circle (default)
-
-## Files
-
-- `TEST_VIA_IN_CELL.py`: Main implementation with GridVisualizer class
-- `demo_simple_grid.py`: Simple 3x3 demonstration
-- `README.md`: This documentation
-
-## Requirements
+## 环境要求
 
 - Python 3.x
 - numpy
 - matplotlib
 
-Install dependencies:
-```bash
-pip install numpy matplotlib
-```
 
-## Examples
-
-### Run the main example (4x5 grid):
-```bash
-python3 GridVisualizer.py
-```
-
-### Run the simple demo (3x3 grid):
-```bash
-python3 demo_simple_grid.py
-```
-
-Both will save PNG files to `/tmp/` directory for viewing.
+## 开发日志
+### v0.0.3 (2025.9.9)
+- 修好了观测空间问题，重新写了格式
+### v0.0.2 (2025.9.9)
+- 修好了碰撞、摩擦，但是出现了有障碍无法训练、观测空间对不上的问题
+### v0.0.1 (2025.9.7)
+- 第一次迭代完成，启动后必须要按一下shift退出中文输入法。能检测到碰撞，但没有反弹。自己和障碍碰撞检测不到
