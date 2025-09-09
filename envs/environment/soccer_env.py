@@ -12,9 +12,12 @@ import pygame
 import numpy as np
 import gym
 from gym import spaces
-from entities import Ball, Player, Obstacle
-from physics import collide_rect_rect, collide_rect_circle, handle_collision
-from utils import draw_field, is_goal
+from envs.entities.ball import Ball
+from envs.entities.obstacle import Obstacle
+from envs.entities.player import Player
+from envs.physics.collision import collide_rect_rect, collide_rect_circle
+from envs.physics.response import handle_collision
+from utils.utils import draw_field, is_goal
 
 
 class SoccerEnv(gym.Env):
