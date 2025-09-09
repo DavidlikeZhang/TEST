@@ -1,23 +1,21 @@
-#!/usr/bin/python
-# -*- coding:utf-8 -*-
-# @author  : Zhang Jinbin
-# @time    : 2025/9/7 9:24
-# @function: the script is used to do something.
-# @version : V1
+# 分类: 环境模块
+# 描述: 定义强化学习环境（SoccerEnv），包括状态空间、动作空间和奖励函数等。
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import random
-
-# 注意，己方球员在仿真器中位于左方
-
 import pygame
 import numpy as np
+from gym import Env, spaces
 import gym
-from gym import spaces
 from envs.entities.ball import Ball
-from envs.entities.obstacle import Obstacle
 from envs.entities.player import Player
+from envs.entities.obstacle import Obstacle
 from envs.physics.collision import collide_rect_rect, collide_rect_circle
 from envs.physics.response import handle_collision
-from utils.utils import draw_field, is_goal
+from envs.physics.utils import draw_field, is_goal
 
 
 class SoccerEnv(gym.Env):
@@ -39,7 +37,7 @@ class SoccerEnv(gym.Env):
         self.right_reward = 0.001
         # 如果球员能看到球，给予奖励
         self.see_ball_reward = 0.1
-        self.time_penalty = -0.01  # 时间惩罚
+        self.time_penalty = -0.05  # 时间惩罚
         # 摔倒惩罚
         self.bump_penalty = -0.2
         # 撞到队友了
@@ -103,7 +101,7 @@ class SoccerEnv(gym.Env):
         self.players = [Player(100 + i * 100, self.height // 2) for i in range(self.num_players)]
         
         # 创建障碍物
-        self.obstacles = [Obstacle(300 + i * 150, self.height // 2) for i in range(self.num_obstacles)]
+        self.obstacles = [Obstacle(500 + i * 50, self.height // 2) for i in range(self.num_obstacles)]
         
         # 重置奖励和完成标志
         self.reward = 0
@@ -114,6 +112,10 @@ class SoccerEnv(gym.Env):
             player.prev_vx = 0
             player.prev_vy = 0
             player.prev_angle = player.angle
+        
+        # # 调试代码：打印 observation_space 和实际返回的观察值形状
+        #print("Observation space shape:", self.observation_space.shape)
+        # obs = self.reset()
         
         return self._get_observation()
 
@@ -165,33 +167,16 @@ class SoccerEnv(gym.Env):
         # 处理碰撞
         self._handle_collisions()
 
-        # 边界检查
-        boundary_reward, self.done, boundary_info = self._check_boundaries()
-        self.reward += boundary_reward
+        self.reward = self._calculate_reward()
 
         # 检查是否进球
-        goal = is_goal(self.ball, self.width, self.height)
+        goal = is_goal(self.ball, self.width-50+self.ball.radius, self.height)
         if goal == -1:  # 左队进球
-            self.reward += -self.goal_reward
-
-            print(1)
+            print("left_win!")
             self.done = True
         elif goal == 1:  # TODO：右队进球，我们默认是右队，实际部署是也要这样
-            self.reward = 10
             self.done = True
-
-        # 额外奖励：球向右球门移动
-        dx = self.ball.x - self.width // 2
-        self.reward += dx * self.right_reward
-
-        # 如果球员能看到球，给予奖励
-        for player in self.players:
-            if player.can_see_ball:
-                self.reward += self.see_ball_reward
-
-        self.reward += self.time_penalty
-        self.reward += self._reward_2the_ball()
-        self.reward += self._reward_smooth_movement()
+            print("right_win!")
 
         return self._get_observation(), self.reward, self.done, {}
 
@@ -225,14 +210,6 @@ class SoccerEnv(gym.Env):
                 obstacle.x / self.width,
                 obstacle.y / self.height
             ])
-
-        # 障碍物状态
-        for obstacle in self.obstacles:
-            obs.extend([
-                obstacle.x / self.width,
-                obstacle.y / self.height
-            ])
-
         return np.array(obs, dtype=np.float32)
 
     def _handle_collisions(self):
@@ -331,21 +308,6 @@ class SoccerEnv(gym.Env):
                 
         return reward, game_reset, {}
 
-        # 障碍物的边界检查
-        for obstacle in self.obstacles:
-            half_w = obstacle.width / 2
-            half_h = obstacle.height / 2
-
-            if obstacle.x - half_w < 0:
-                obstacle.x = half_w
-            elif obstacle.x + half_w > self.width:
-                obstacle.x = self.width - half_w
-
-            if obstacle.y - half_h < 0:
-                obstacle.y = half_h
-            elif obstacle.y + half_h > self.height:
-                obstacle.y = self.height - half_h
-
     def render(self, mode='human'):
         """渲染环境"""
         if self.screen is None:
@@ -389,6 +351,45 @@ class SoccerEnv(gym.Env):
             self.isopen = False
 
 # ------------------------------奖励函数------------------------------ #
+    def _calculate_reward(self):
+        reward = 0
+        reward += self._calculate_boundary_reward()
+        reward += self._calculate_goal_reward()
+        reward += self._calculate_ball_movement_reward()
+        reward += self._calculate_player_vision_reward()
+        reward += self.time_penalty
+        reward += self._reward_2the_ball()
+        reward += self._reward_smooth_movement()
+        return reward
+
+    def _calculate_boundary_reward(self):
+        boundary_reward, self.done, boundary_info = self._check_boundaries()
+        self.reward += boundary_reward
+        return boundary_reward
+
+    def _calculate_goal_reward(self):
+        goal_reward = 0
+        goal = is_goal(self.ball, self.width - 50 + self.ball.radius, self.height)
+        if goal == -1:  # 左队进球
+            goal_reward += self.goal_reward
+        elif goal == 1:  # 右队进球
+            goal_reward += 10
+        self.reward += -goal_reward
+        return goal_reward
+
+    def _calculate_ball_movement_reward(self):
+        dx = self.ball.x - self.width // 2
+        ball_movement_reward = dx * self.right_reward
+        self.reward += ball_movement_reward
+        return ball_movement_reward
+
+    def _calculate_player_vision_reward(self):
+        player_vision_reward = 0
+        for player in self.players:
+            if player.can_see_ball:
+                player_vision_reward += self.see_ball_reward
+        self.reward += player_vision_reward
+        return player_vision_reward
 
     def _reward_smooth_movement(self):
         """
@@ -508,3 +509,4 @@ class SoccerEnv(gym.Env):
             total_reward += player_reward
         
         return total_reward
+
