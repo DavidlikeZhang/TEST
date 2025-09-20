@@ -7,18 +7,16 @@
 
 # 注意！！！！！！！！！，使用英文输入法，否则控制不了
 
-
-
 import pygame
 import numpy as np
 from envs.environment.soccer_env import SoccerEnv
-
+from envs.environment.reward_wrapper import DefaultRewardWrapper
 
 def main():
     # 创建环境
-    env = SoccerEnv(width=800, height=600, num_players=3)
-    action_n = env.action_num
-    obs = env.reset()
+    env = DefaultRewardWrapper(SoccerEnv(width=800, height=600, num_players=3))
+    action_n = env.env.action_num
+    obs, _ = env.reset()
 
     # 手动控制参数
     key_actions = {
@@ -42,27 +40,25 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        keys = pygame.key.get_pressed()  # 返回一个布尔序列
-        # if keys[pygame.K_SPACE]:
-        #     print("空格键被按下")
+        keys = pygame.key.get_pressed()
         for key, act in key_actions.items():
             if keys[key]:
                 action[:action_n] += act
 
         # 对第一个球员应用动作，其他球员随机行动
         for i in range(1, env.num_players):
-            idx = i * action_n # 目前，每个球员有三个动作
+            idx = i * action_n
             action[idx:idx + action_n] = env.action_space.sample()[idx:idx + action_n]
 
         # 执行动作
-        obs, reward, done, _ = env.step(action)
+        obs, reward, done, truncated, info = env.step(action)
 
         # 显示一些信息
         # print(f"Reward: {reward:.2f}")
 
         if done:
             print("Episode finished!")
-            obs = env.reset()
+            obs, _ = env.reset()
 
         # 控制帧率
         pygame.time.delay(30)

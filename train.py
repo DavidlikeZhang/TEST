@@ -1,8 +1,9 @@
 from stable_baselines3 import PPO
 from envs.environment.soccer_env import SoccerEnv
+from envs.environment.reward_wrapper import DefaultRewardWrapper
 
 # 创建环境
-env = SoccerEnv()
+env = DefaultRewardWrapper(SoccerEnv())
 
 # 创建并训练模型
 model = PPO("MlpPolicy", env, verbose=1, device='cuda',
@@ -17,10 +18,10 @@ model.learn(total_timesteps=100000)
 model.save("soccer_ppo_model")
 
 # 测试训练好的模型
-obs = env.reset()
+obs, _ = env.reset()
 for _ in range(1000):
     action, _states = model.predict(obs, deterministic=True)
-    obs, reward, done, info = env.step(action)
+    obs, reward, done, truncated, info = env.step(action)
     env.render()
     if done:
-        obs = env.reset()
+        obs, _ = env.reset()
